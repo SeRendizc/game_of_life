@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 
-const numRows = 30;
-const numCols = 50;
+const numRows = 40;
+const numCols = 80;
 
 const operations = [
   [0, 1],
@@ -57,7 +57,7 @@ const GameOfLife = () => {
       );
     });
 
-    setTimeout(runSimulation, 100);
+    timeoutRef.current = setTimeout(runSimulation, 100);
   }, [running]);
 
   useEffect(() => {
@@ -71,18 +71,15 @@ const GameOfLife = () => {
   }, [running, runSimulation]);
 
   return (
-    <>
+    <> 
       <button onClick={() => {
         setRunning(!running);
-        if (!running) {
-          runSimulation();
-        }
       }}>
         {running ? '停止' : '开始'}
       </button>
       <div style={{
         display: 'grid',
-        gridTemplateColumns: `repeat(${numCols}, 20px)`
+        gridTemplateColumns: `repeat(${numCols}, 15px)`
       }}>
         {grid.map((rows, i) =>
           rows.map((col, k) => (
@@ -90,12 +87,12 @@ const GameOfLife = () => {
               key={`${i}-${k}`}
               onClick={() => {
                 const newGrid = [...grid];
-                newGrid[i][k] = grid[i][k] ? 0 : 1;
+                newGrid[i][k] = 1 - grid[i][k];
                 setGrid(newGrid);
               }}
               style={{
-                width: 20,
-                height: 20,
+                width: 15,
+                height: 15,
                 backgroundColor: grid[i][k] ? 'black' : undefined,
                 border: 'solid 1px gray'
               }}
