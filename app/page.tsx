@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 
-const numRows = 40;
-const numCols = 80;
+const numRows = 50;
+const numCols = 100;
 
 const operations = [
   [0, 1],
@@ -27,6 +27,8 @@ const generateEmptyGrid = () => {
 const GameOfLife = () => {
   const [grid, setGrid] = useState(() => generateEmptyGrid());
   const [running, setRunning] = useState(false);
+  const [speed, setSpeed] = useState(1);
+  const [customSpeed, setCustomSpeed] = useState('');
   const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   const runSimulation = useCallback(() => {
@@ -57,18 +59,42 @@ const GameOfLife = () => {
       );
     });
 
-    timeoutRef.current = setTimeout(runSimulation, 100);
-  }, [running]);
+    timeoutRef.current = setTimeout(runSimulation, 100 / speed);
+  }, [running, speed]);
 
   useEffect(() => {
-    if (running) {
-      runSimulation();
-    } else {
+    const clearTimer = () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
+    };
+    
+    if (running) {
+      runSimulation();
+    } else {
+      clearTimer();
     }
+
+    return clearTimer;
   }, [running, runSimulation]);
+
+  const handleSpeedChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    if (value === 'custom') {
+      setSpeed(Number(customSpeed) || 1);
+    } else {
+      setSpeed(Number(value));
+      setCustomSpeed('');
+    }
+  };
+
+  const handleCustomSpeedChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setCustomSpeed(value);
+    if (value) {
+      setSpeed(Number(value));
+    }
+  };
 
   return (
     <> 
@@ -77,9 +103,37 @@ const GameOfLife = () => {
       }}>
         {running ? '停止' : '开始'}
       </button>
+      <div>
+        <label htmlFor="speed">速度:</label>
+        <select
+          id="speed"
+          value={customSpeed ? 'custom' : speed}
+          onChange={handleSpeedChange}
+        >
+          <option value={0.25}>0.25x</option>
+          <option value={0.5}>0.5x</option>
+          <option value={1}>1x</option>
+          <option value={2}>2x</option>
+          <option value={4}>4x</option>
+          <option value={8}>8x</option>
+          <option value={16}>16x</option>
+          <option value={32}>32x</option>
+          <option value={64}>64x</option>
+          <option value={128}>128x</option>
+          <option value="custom">自定义</option>
+        </select>
+        {customSpeed !== '' && (
+          <input
+            type="number"
+            value={customSpeed}
+            onChange={handleCustomSpeedChange}
+            placeholder="输入自定义速度"
+          />
+        )}
+      </div>
       <div style={{
         display: 'grid',
-        gridTemplateColumns: `repeat(${numCols}, 15px)`
+        gridTemplateColumns: `repeat(${numCols}, 10px)`
       }}>
         {grid.map((rows, i) =>
           rows.map((col, k) => (
@@ -91,8 +145,8 @@ const GameOfLife = () => {
                 setGrid(newGrid);
               }}
               style={{
-                width: 15,
-                height: 15,
+                width: 10,
+                height: 10,
                 backgroundColor: grid[i][k] ? 'black' : undefined,
                 border: 'solid 1px gray'
               }}
