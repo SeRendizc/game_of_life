@@ -126,6 +126,25 @@ const GameOfLife = () => {
     return clearTimer;
   }, [running, runSimulation]);
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === ' ') {
+        setRunning(r => !r);
+      } else if (e.key === 's') {
+        singleSimulation();
+      } else if (e.key === 'r') {
+        resetGame();
+      } else if (e.key === 'g') {
+        randomizeGrid();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   const handleSpeedChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     if (value === 'custom') {
@@ -186,7 +205,7 @@ const GameOfLife = () => {
           onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#ddd'}
           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = ''}
         >
-          {running ? '暂停迭代' : '自动迭代'}
+          {running ? '暂停迭代 (Space)' : '自动迭代 (Space)'}
         </button>
         <button 
           onClick={singleSimulation} 
@@ -194,7 +213,7 @@ const GameOfLife = () => {
           onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#ddd'}
           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = ''}
         >
-          单次迭代
+          单次迭代 (S)
         </button>
         <button 
           onClick={resetGame} 
@@ -202,7 +221,7 @@ const GameOfLife = () => {
           onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#ddd'}
           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = ''}
         >
-          重置状态
+          重置状态 (R)
         </button>
         <button 
           onClick={randomizeGrid} 
@@ -210,7 +229,7 @@ const GameOfLife = () => {
           onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#ddd'}
           onMouseLeave={(e) => e.currentTarget.style.backgroundColor = ''}
         >
-          随机生成
+          随机生成 (G)
         </button>
         <div>
           <label htmlFor="speed">速度:</label>
